@@ -1,4 +1,4 @@
-import mongoose, { model } from "mongoose";
+import mongoose, {Schema} from "mongoose";
 
 
 const blackListTokenSchema = new Schema({

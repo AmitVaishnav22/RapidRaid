@@ -15,9 +15,9 @@ app.use(express.static("public"))
 app.use(cookieParser())    
 
 import userRouter from "../backend/routes/user.routes.js"
-
+import captainRouter from  "../backend/routes/captain.routes.js"
 app.use("/api/v1/user",userRouter)
-
+app.use("/api/v1/captain",captainRouter)
 export {
     app
  };

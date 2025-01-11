@@ -57,7 +57,21 @@ const loginUser= asyncHandler(async(req,res)=>{
 })
 
 
+const getCurrentUser=asyncHandler(async(req,res)=>{
+    return res.status(200)
+              .json(new apiResponse(200,req.user,"currentUser fetched"))
+})
+
+const logOutUser= asyncHandler(async(req,res)=>{
+    const token=req.cookies.token || req.headers.authorization.split(" ")[1]
+    await BlackListToken.create({token})
+    res.clearCookie('token')
+    return res.status(200).json(new apiResponse(200,null,"User successfully logged out"))
+})
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    getCurrentUser,
+    logOutUser
 }
