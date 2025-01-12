@@ -1,11 +1,48 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../store/userSlice'
+import axios from "axios"
 
 function UserSignUp() {
-
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
   const [ userFullName, setUserFullName ] = useState('')
+  const [ userData, setUserData ] = useState({})
+
+  const submitHandler = async (e) => {
+    e.preventDefault()
+    const newUser = {
+      fullname: userFullName,
+      email: email,
+      password: password
+    }
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/register`, newUser);
+  
+      if (response.status === 200 && response.data?.data?.user) {
+        const user = response.data.data.user;
+        localStorage.setItem('token', response.data.data.token)
+        //console.log(user); 
+        dispatch(setUser(user));
+        navigate('/home');
+      } else {
+        console.error('Unexpected response structure:', response);
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+    }
+  
+    setEmail('')
+    setUserFullName('')
+    setPassword('')
+
+  }
+
+
   return (
     <div>
       <div className='p-7 h-screen flex flex-col justify-between'>

@@ -1,11 +1,15 @@
 import React,{useState} from 'react'
-import {Link} from "react-router-dom"
+import {Link,useNavigate} from "react-router-dom"
+import { useDispatch } from 'react-redux'
+import axios from 'axios'
+import { setUser } from '../store/userSlice'
 
 function UserLogin() {
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
   const [ userData, setUserData ] = useState({})
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const submitHandler = async (e) => {
     e.preventDefault();
 
@@ -13,7 +17,20 @@ function UserLogin() {
       email: email,
       password: password
     }
-    console.log(userData)
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`, userData)
+      if (response.status === 200 && response.data?.data?.user) {
+            const user = response.data.data.user;
+            localStorage.setItem('token', response.data.data.token)
+            dispatch(setUser(user));
+            navigate('/home');
+      } else {
+          console.error('Unexpected response structure:', response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     setEmail('')
     setPassword('')

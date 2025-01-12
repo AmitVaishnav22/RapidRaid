@@ -1,15 +1,20 @@
 import React,{useState} from 'react'
-import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { Link, useNavigate } from 'react-router-dom'
+import {setCaptain} from "../store/captainSlice.js"
+import axios from 'axios'
 
 function CaptainSignUp() {
     const [ email, setEmail ] = useState('')
     const [ password, setPassword ] = useState('')
     const [ CaptainFullName, setCaptainFullName ] = useState('')
-  
     const [ vehicleColor, setVehicleColor ] = useState('')
     const [ vehiclePlate, setVehiclePlate ] = useState('')
     const [ vehicleCapacity, setVehicleCapacity ] = useState('')
     const [ vehicleType, setVehicleType ] = useState('')
+
+    const navigate=useNavigate()
+    const dispatch = useDispatch()
 
 
     const submitHandler = async (e) => {
@@ -25,6 +30,23 @@ function CaptainSignUp() {
             vehicleType: vehicleType
           }
         }
+
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`, captainData);
+        
+            if (response.status === 200 && response.data?.data?.captain) {
+                //console.log('Captain registered successfully:', response.data.data.captain);
+              const captain = response.data.data.captain;
+              localStorage.setItem('token', response.data.data.token)
+              console.log(captain); 
+              dispatch(setCaptain(captain));
+              navigate('/captain/home');
+            } else {
+              console.error('Unexpected response structure:', response);
+            }
+          } catch (error) {
+            console.error('Error during registration:', error);
+          }
         setEmail('')
         setCaptainFullName('')
         setPassword('')

@@ -1,19 +1,37 @@
 import React,{useState} from 'react'
-import {Link} from "react-router-dom"
-
+import {Link, useNavigate} from "react-router-dom"
+import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { setCaptain } from '../store/captainSlice'
 function CaptainLogin() {
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
   const [ userData, setUserData ] = useState({})
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    const userData = {
+    const captainData = {
       email: email,
       password: password
     }
     //console.log(userData)
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/login`, captainData)
+      if (response.status === 200 && response.data?.data?.captain) {
+            const captain = response.data.data.captain;
+            localStorage.setItem('token', response.data.data.token)
+            dispatch(setCaptain(captain));
+            navigate('/captain/home');
+      } else {
+          console.error('Unexpected response structure:', response);
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     setEmail('')
     setPassword('')
